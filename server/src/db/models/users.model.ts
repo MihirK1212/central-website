@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
 
-import * as mongoose from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document , Schema as MongooseSchema } from 'mongoose';
 
 import { Content } from './content.model'
+
+export type UserDocument = User & Document;
 
 @Schema()
 export class User extends Document {
@@ -14,11 +15,11 @@ export class User extends Document {
     @Prop()
     userEmailId : string;
 
-    @Prop(({ type: mongoose.Schema.Types.ObjectId, ref: 'Content' }))
-    currentVersion : Content;
-
-    @Prop(({ type: mongoose.Schema.Types.ObjectId, ref: 'Content' }))
+    @Prop(({ type: MongooseSchema.Types.ObjectId, ref: 'Content' }))
     publishedVersion : Content;
+
+    @Prop(({ type: MongooseSchema.Types.ObjectId, ref: 'Content' }))
+    currentVersion : Content;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -1,7 +1,9 @@
 /* eslint-disable prettier/prettier */
 
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema , SchemaFactory} from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+
+export type SectionChildDocument = SectionChild & Document;
 
 @Schema()
 export class SectionChild extends Document {
@@ -26,3 +28,6 @@ export class SectionChild extends Document {
     @Prop()
     visible : boolean;
 }
+
+
+export const SectionChildSchema = SchemaFactory.createForClass(SectionChild);

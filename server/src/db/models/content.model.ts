@@ -1,15 +1,17 @@
 /* eslint-disable prettier/prettier */
 
-import * as mongoose from 'mongoose';
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+// import * as mongoose from 'mongoose';
+import { Prop,  Schema , SchemaFactory } from '@nestjs/mongoose';
+import { Document , Schema as MongooseSchema } from 'mongoose';
 
 import { Section } from './sections.model'
+
+export type ContentDocument = Content & Document;
 
 @Schema()
 export class Content extends Document {
    
-    @Prop()
+    @Prop({required : true})
     userEmailId : string;
 
     @Prop()
@@ -63,10 +65,10 @@ export class Content extends Document {
     @Prop()
     themeDetails : string;
 
-    @Prop(({ type: [mongoose.Schema.Types.ObjectId] , ref : 'Section'}))
-    sectionSequence : Section[];
+    @Prop(({ type: [String] , default : []}))
+    sectionSequence : string[];
 
-    @Prop({ type: [Section], default: [] })
+    @Prop(({ type: [MongooseSchema.Types.ObjectId] , ref : 'Section' , default : []}))
     sections : Section[];
 }
 

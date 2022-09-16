@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
 
-import * as mongoose from 'mongoose';
-import { Prop, Schema } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Prop,  Schema , SchemaFactory } from '@nestjs/mongoose';
+import { Document , Schema as MongooseSchema } from 'mongoose';
 
 import {SectionChild} from './sectionchildren.model';
+
+export type SectionDocument = Section & Document;
 
 @Schema()
 export class Section extends Document {
@@ -30,11 +31,12 @@ export class Section extends Document {
     @Prop()
     visible : boolean;
 
-    @Prop(({ type: [mongoose.Schema.Types.ObjectId] , ref : 'SectionChild'}))
-    sectionChildSequence : SectionChild[];
+    @Prop(({ type: [String] , default : []}))
+    sectionChildSequence : string[];
 
-    @Prop({ type: [SectionChild], ref : 'SectionChild' })
+    @Prop(({ type: [MongooseSchema.Types.ObjectId] , ref : 'SectionChild' , default : []}))
     sectionContent : SectionChild[];
 }
 
+export const SectionSchema = SchemaFactory.createForClass(Section);
 
