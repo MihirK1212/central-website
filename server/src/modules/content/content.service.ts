@@ -11,7 +11,6 @@ import { SectionChildDocument } from "src/db/models/sectionchildren.model";
 import { AddSectionDto } from "src/db/dto/add-section.dto";
 import { AddSectionChildDto } from "src/db/dto/add-section-child.dto";
 import { UpdateSectionDto } from "src/db/dto/update-section.dto";
-import { DeleteSectionDto } from "src/db/dto/delete-section.dto";
 import { UpdateContentVersionDto } from "src/db/dto/update-content-version.dto";
 
 @Injectable()
@@ -35,54 +34,25 @@ export class ContentService{
         return contentVersions as ContentDocument[]
     }
 
-    async getContentVersion(contentId : string) {
-        try{
-            const contentVersion = await this.contentModel.findById(contentId).populate({
-                path : 'sections',
-                populate : {
-                    path : 'sectionContent'
-                }
-            }).exec()
+    async updateContentVersion(contentVersionId:string,updatedContentVersion: UpdateContentVersionDto){
 
-            return contentVersion as ContentDocument
-        }
-        catch{
-            throw new NotFoundException('Could not find content version')
-        }
-    }
+        // console.log("Update content version service ",contentVersionId,updatedContentVersion)
 
-    async updateContentVersion(updateContentVersionDetails : UpdateContentVersionDto){
-
-        const contentVersionId = updateContentVersionDetails.contentVersionId
-        let updatedContentVersion = updateContentVersionDetails.contentVersion
-    
         updatedContentVersion = this.omitNull(updatedContentVersion)
-
-        if(updatedContentVersion.userDetails){
-            updatedContentVersion.userDetails = this.omitNull(updatedContentVersion.userDetails)
+    
+        if(updatedContentVersion.socialMedia){
+            updatedContentVersion.socialMedia = this.omitNull(updatedContentVersion.socialMedia)
         }
-        if(updatedContentVersion.homePagePoster){
-            updatedContentVersion.homePagePoster = this.omitNull(updatedContentVersion.homePagePoster)
-        }
-        if(updatedContentVersion.contactDetails){
-            updatedContentVersion.contactDetails = this.omitNull(updatedContentVersion.contactDetails)
-        }
-        if(updatedContentVersion.userDetails.socialMedia){
-            updatedContentVersion.userDetails.socialMedia = this.omitNull(updatedContentVersion.userDetails.socialMedia)
-        }
-
-        console.log(updatedContentVersion)
         
         await this.contentModel.updateOne({_id : contentVersionId} , { '$set': updatedContentVersion })
     }
 
-    async addSection(newSection : AddSectionDto){
+    async addSection(contentVersionId:string,newSection : AddSectionDto){
 
         try {
-            const newSectionInstance = new this.sectionModel(newSection.section)
+            const newSectionInstance = new this.sectionModel(newSection)
             const result = await newSectionInstance.save()
 
-            const contentVersionId = newSection.contentVersionId
             const sectionId = result.id
 
             await this.contentModel.updateOne(
@@ -95,7 +65,9 @@ export class ContentService{
                 { $push: { sections  : sectionId } }
             )
 
-            return sectionId as string
+            const generatedSection = await this.sectionModel.findById(sectionId).exec()
+
+            return generatedSection as SectionDocument
 
         } 
         
@@ -109,7 +81,13 @@ export class ContentService{
             const sectionId = updateSectionDetails.sectionId
             const updatedSection   = this.omitNull(updateSectionDetails.section)
 
-            await this.sectionModel.updateOne({_id : sectionId},{...updatedSection})
+            await this.sectionModel.updateOne({_id : sectionId},{ '$set' : updatedSection})
+
+            updatedSection.sectionContent.map(async (sectionChild : SectionChildDocument)=>{
+                const sectionChildId = sectionChild._id
+
+                await this.sectionChildModel.updateOne({_id : sectionChildId},{ '$set' : sectionChild})
+            })
 
             return sectionId as string
 
@@ -118,10 +96,9 @@ export class ContentService{
         }
     }
 
-    async deleteSection(deleteSectionDetails : DeleteSectionDto){
+    async deleteSection(contentVersionId:string,sectionId:string){
         try {
-            const contentVersionId = deleteSectionDetails.contentVersionId
-            const sectionId = deleteSectionDetails.sectionId
+            console.log("In delete section service")
 
             await this.contentModel.updateOne(
                 { _id: contentVersionId },
@@ -142,13 +119,14 @@ export class ContentService{
         }
     } 
 
-    async addSectionChild(newSectionChild : AddSectionChildDto){
+    async addSectionChild(newSectionChildDetails : AddSectionChildDto){
 
         try {
-            const newSectionChildInstance = new this.sectionChildModel(newSectionChild.sectionChild)
-            const result = await newSectionChildInstance.save()
+            const sectionId = newSectionChildDetails.sectionId
+            const newSectionChild = newSectionChildDetails.sectionChild
 
-            const sectionId = newSectionChild.sectionId
+            const newSectionChildInstance = new this.sectionChildModel(newSectionChild)
+            const result = await newSectionChildInstance.save()
             const sectionChildId = result.id
 
             await this.sectionModel.updateOne(
@@ -161,7 +139,9 @@ export class ContentService{
                 { $push: { sectionContent : sectionChildId } }
             )
 
-            return sectionChildId as string
+            const generatedSectionChild = await this.sectionChildModel.findById(sectionChildId).exec()
+
+            return generatedSectionChild as SectionChildDocument
         } 
         
         catch (error) {
@@ -171,7 +151,7 @@ export class ContentService{
 
     private omitNull(obj : any) : any {
         if(obj === null){return}
-        Object.keys(obj).filter(k => obj[k] === null).forEach(k => delete(obj[k]))
+        Object.keys(obj).filter(k => (obj[k] === null)).forEach(k => delete(obj[k]))
         return obj
     }
 } 

@@ -23,11 +23,20 @@ export class UsersService{
         return users as UserDocument[]
     }
 
-    async getUser(userId : string) {
+    async getContentVersion(userEmailId : string , type : string) {
         try{
-            const user = await this.userModel.findById(userId).populate('currentVersion').populate('publishedVersion').exec()
+            const user = await this.userModel.findOne({userEmailId : userEmailId}).exec()
 
-            return user as UserDocument
+            const contentVersionId = (type === "admin")?(user.currentVersion):(user.publishedVersion)
+
+            const contentVersion = await this.contentModel.findById(contentVersionId).populate({
+                path : 'sections',
+                populate : {
+                    path : 'sectionContent'
+                }
+            }).exec()
+
+            return contentVersion as ContentDocument
         }
         catch{
             throw new NotFoundException('Could not find user')
@@ -36,13 +45,8 @@ export class UsersService{
 
     async addUser(newUserDetails : AddUserDto){
         
-        const publishedVersion = newUserDetails.contentVersion
-        const currentVersion = newUserDetails.contentVersion
-
-        publishedVersion.versionNumber = 1
-        publishedVersion.userEmailId = newUserDetails.userEmailId
-        currentVersion.versionNumber = 2
-        currentVersion.userEmailId = newUserDetails.userEmailId
+        const publishedVersion = {...newUserDetails.contentVersion , versionNumber : 1}
+        const currentVersion   = {...newUserDetails.contentVersion , versionNumber : 2}
         
         const publishedVersionInstance = new this.contentModel(publishedVersion)
         const publishResult = await publishedVersionInstance.save()
@@ -65,15 +69,28 @@ export class UsersService{
         return result.id as string
     }
 
-    async publishVersion(userId : string){
-        const user = await this.userModel.findById(userId).populate('currentVersion').populate('publishedVersion').exec()
+    async publishVersion(userEmailId : string){
+        const user = await this.userModel.findOne({userEmailId:userEmailId}).populate('currentVersion').populate('publishedVersion').exec()
 
         const publishedVersion = user.publishedVersion
         
-        const currentVersion   = user.currentVersion
-        delete(currentVersion['_id'])
+        const currentVersion = user.currentVersion
 
-        await this.contentModel.updateOne({_id : publishedVersion._id} , { '$set': {...currentVersion} })
+        const toPublish = {
+            versionNumber : 1,
+            name : currentVersion.name,
+            emailId : currentVersion.emailId,
+            phoneNumber : currentVersion.phoneNumber,
+            logoSrc : currentVersion.logoSrc,
+            posterSrc : currentVersion.posterSrc,
+            posterCaption : currentVersion.posterCaption,
+            socialMedia : currentVersion.socialMedia,
+            themeDetails : currentVersion.themeDetails,
+            sectionSequence : currentVersion.sectionSequence,
+            sections : currentVersion.sections
+        }
+
+        await this.contentModel.updateOne({_id : publishedVersion._id} , { '$set': {...toPublish} })
 
         return currentVersion as ContentDocument
     }

@@ -32,12 +32,12 @@ function MobileNavbar({profilePic}) {
               </ListItemText>
             </ListItem> */}
                         <Divider />
-                        <ListItem onClick={() => setOpenDrawer(false)}>
+                        {/* <ListItem onClick={() => setOpenDrawer(false)}>
                             <ListItemText>
                                 <Link to="#">Change Theme</Link>
                             </ListItemText>
                         </ListItem>
-                        <Divider />
+                        <Divider /> */}
 
                     </List>
                 </Drawer>

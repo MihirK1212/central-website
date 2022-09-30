@@ -24,25 +24,17 @@ function Navbar({profilePic}) {
         >
           Preview
         </Button>
-        {/* <Button
-          variant="contained"
-          className="nav-btn"
-          id="second-btn"
-          color="primary"
-        >
-          Publish
-        </Button> */}
       </span>
 
       <span id="right">
-        <Button
+        {/* <Button
           variant="contained"
           className="nav-btn"
           id="third-btn"
           color="primary"
         >
           Change Theme
-        </Button>
+        </Button> */}
         <Button
           variant="contained"
           className="nav-btn"

@@ -1,43 +1,37 @@
 /* eslint-disable prettier/prettier */
-import { Controller , Post , Get, Patch, Delete, Body, Param} from "@nestjs/common";
+import { Controller , Post ,Patch, Delete, Body , Req , NotFoundException , Param} from "@nestjs/common";
 import { ContentService } from "./content.service";
+import { Request } from 'express';
 
 import { AddSectionDto } from "src/db/dto/add-section.dto";
 import { AddSectionChildDto } from "src/db/dto/add-section-child.dto";
 import { UpdateSectionDto } from "src/db/dto/update-section.dto";
-import { DeleteSectionDto } from "src/db/dto/delete-section.dto";
 import { UpdateContentVersionDto } from "src/db/dto/update-content-version.dto";
+
+import * as cloudinaryPkg from 'cloudinary'
 
 @Controller('api/content')
 export class ContentController {
     
-    constructor(private contentService : ContentService){}
-
-    @Get()
-    async getContentVersions() {
-        return {contentVersions : await this.contentService.getContentVersions()}
-    }
-
-    @Get(':id')
-    async getContentVersion(
-        @Param('id') contentId : string,
-    ) {
-        return await this.contentService.getContentVersion(contentId)
-    }
+    constructor(
+        private contentService : ContentService
+    ){}
 
     @Patch()
     async updateContentVersion(
-        @Body() updateContentVersionDetails : UpdateContentVersionDto,
+        @Body() updatedContentVersion : UpdateContentVersionDto,
+        @Req() req: Request
     ) {
-        return await this.contentService.updateContentVersion(updateContentVersionDetails)
+        return await this.contentService.updateContentVersion(req.body.contentVersionId,updatedContentVersion)
     }
     
     @Post('sections')
     async addSection(
-        @Body() newSection : AddSectionDto
+        @Body() newSection : AddSectionDto,
+        @Req() req: Request
     ) {
-        const generatedId = await this.contentService.addSection(newSection)
-        return {id : generatedId}
+        const generatedSection = await this.contentService.addSection(req.body.contentVersionId,newSection)
+        return {generatedSection : generatedSection}
     }
 
     @Patch('sections')
@@ -48,19 +42,46 @@ export class ContentController {
         return {id : updatedId}
     }
 
-    @Delete('sections')
+    @Delete('sections/:id')
     async deleteSection(
-        @Body() deleteSectionDetails : DeleteSectionDto
+        @Param('id') sectionId : string,
+        @Req() req: Request
     ) {
-        const deletedId = await this.contentService.deleteSection(deleteSectionDetails)
+        const deletedId = await this.contentService.deleteSection(req.body.contentVersionId,sectionId)
         return {id : deletedId}
     }
 
     @Post('sections/sectionChildren')
     async addSectionChild(
-        @Body() newSectionChild : AddSectionChildDto
+        @Body() newSectionChildDetails : AddSectionChildDto
     ) {
-        const generatedId = await this.contentService.addSectionChild(newSectionChild)
-        return {id : generatedId}
+        const generatedSectionChild = await this.contentService.addSectionChild(newSectionChildDetails)
+        return {generatedSectionChild : generatedSectionChild}
+    }
+
+    @Post('image')
+    async uploadImageServer(
+        @Body() imgData : any
+    ) {
+        try {
+
+            const cloudinary = cloudinaryPkg.v2
+            cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET
+            })
+
+            imgData = JSON.parse(imgData.img)
+            const imgString = imgData.data
+            const uploadResponse = await cloudinary.uploader.upload(imgString);
+            const imgURL = uploadResponse.secure_url
+
+            console.log("imgURL generated ",imgURL)
+            return {imgURL : imgURL}
+        } catch (error) {
+            console.log(error)
+            throw new NotFoundException('Could not upload image')  
+        }
     }
 }

@@ -12,7 +12,7 @@ import { styles } from "../../../variable-css";
 
 const useStyles = makeStyles(styles)
 
-const FormTextField = ({ fieldName, label, type, autoCompleteHint, postData, setPostData , editing }) => {
+const FormTextField = ({ fieldName, label, type, autoCompleteHint, userProfile, setUserProfile , editing }) => {
   return (
     <TextField
       variant={'standard'}
@@ -20,17 +20,16 @@ const FormTextField = ({ fieldName, label, type, autoCompleteHint, postData, set
       label={label}
       type={type}
       autoComplete={autoCompleteHint}
-      value={postData[fieldName]}
-      onChange={(e) => setPostData({ ...postData, [fieldName]: e.target.value })} style={{ marginBlock: 10 }}
+      value={userProfile[fieldName]}
+      onChange={(e) => {setUserProfile({ ...userProfile, [fieldName]: e.target.value })}} style={{ marginBlock: 10 }}
       disabled={!editing}/>
   )
 }
 
-function Form({ postData , setPostData , handleSubmit}) {
+function Form({ userProfile , setUserProfile , handleSubmit}) {
 
     const [editing,setEditing] = useState(false)
 
-    console.log("Editing",editing)
 
     const submitHelper = (e)=>{
 
@@ -48,89 +47,86 @@ function Form({ postData , setPostData , handleSubmit}) {
 
     const classes = useStyles()
 
-
-
     const handleThemeChange = (e) => {
-        console.log("Theme Change",e.target.value)
-        setPostData({... postData,themeDetails : e.target.value})
+        setUserProfile({... userProfile,themeDetails : e.target.value})
     }
 
     return (
 
         <Paper style={{ padding: 20 }}>
-        <Typography align="center" className={classes.subheadingBold}>GENERAL DETAILS</Typography>
-        <form onSubmit={submitHelper} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <FormTextField fieldName={'name'} label={'Club Name'} type={'text'} autoCompleteHint={''} postData={postData} setPostData={setPostData}  editing={editing}/>
-            <FormTextField fieldName={'email'} label={'Email'} type={'email'} autoCompleteHint={'email'} postData={postData} setPostData={setPostData} editing={editing} />
-            <FormTextField fieldName={'phoneNumber'} label={'Phone Number'} type={'tel'} autoCompleteHint={''} postData={postData} setPostData={setPostData} editing={editing}/>
-            <br/>
-            <div className="grid-container">
-                <TextField
-                    variant={'standard'}
-                    // fullWidth
-                    label={'LinkedIn'}
-                    type={'url'}
-                    autoComplete={''}
-                    value={postData.socialMedia.LinkedIn}
-                    onChange={(e) => setPostData({...postData,socialMedia:{...postData.socialMedia, LinkedIn : e.target.value}})} style={{ marginBlock: 10 }}
-                disabled={!editing}/>
 
-                <TextField
-                    variant={'standard'}
-                    // fullWidth
-                    label={'Instagram'}
-                    type={'url'}
-                    autoComplete={''}
-                    value={postData.socialMedia.Instagram}
-                    onChange={(e) => setPostData({...postData,socialMedia:{...postData.socialMedia, Instagram : e.target.value}})} style={{ marginBlock: 10 }}
-                disabled={!editing}/>
+            <Typography align="center" className={classes.subheadingBold}>GENERAL DETAILS</Typography>
 
-                <TextField
-                    variant={'standard'}
-                    // fullWidth
-                    label={'Facebook'}
-                    type={'url'}
-                    autoComplete={''}
-                    value={postData.socialMedia.Facebook}
-                    onChange={(e) => setPostData({...postData,socialMedia:{...postData.socialMedia, Facebook : e.target.value}})} style={{ marginBlock: 10 }}
-                disabled={!editing}/>
+            <form onSubmit={submitHelper} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <FormTextField fieldName={'name'} label={'Club Name'} type={'text'} autoCompleteHint={''} userProfile={userProfile} setUserProfile={setUserProfile}  editing={editing}/>
+                <FormTextField fieldName={'emailId'} label={'Email'} type={'email'} autoCompleteHint={'email'} userProfile={userProfile} setUserProfile={setUserProfile} editing={editing} />
+                <FormTextField fieldName={'phoneNumber'} label={'Phone Number'} type={'tel'} autoCompleteHint={''} userProfile={userProfile} setUserProfile={setUserProfile} editing={editing}/>
 
-                <TextField
-                    variant={'standard'}
-                    // fullWidth
-                    label={'Discord'}
-                    type={'url'}
-                    autoComplete={''}
-                    value={postData.socialMedia.Discord}
-                    onChange={(e) => setPostData({...postData,socialMedia:{...postData.socialMedia, Discord : e.target.value}})} style={{ marginBlock: 10 }}
-                disabled={!editing}/>
-            </div>
+                <br/>
 
+                <div className="grid-container">
+                    <TextField
+                        variant={'standard'}
+                        label={'LinkedIn'}
+                        type={'url'}
+                        autoComplete={''}
+                        value={userProfile.socialMedia.LinkedIn}
+                        onChange={(e) => setUserProfile({...userProfile,socialMedia:{...userProfile.socialMedia, LinkedIn : e.target.value}})} style={{ marginBlock: 10 }}
+                    disabled={!editing}/>
 
+                    <TextField
+                        variant={'standard'}
+                        label={'Instagram'}
+                        type={'url'}
+                        autoComplete={''}
+                        value={userProfile.socialMedia.Instagram}
+                        onChange={(e) => setUserProfile({...userProfile,socialMedia:{...userProfile.socialMedia, Instagram : e.target.value}})} style={{ marginBlock: 10 }}
+                    disabled={!editing}/>
 
-            <FormControl fullWidth>
-                <InputLabel variant={'standard'}>Theme</InputLabel>
-                <Select
-                    value={postData.themeDetails}
-                    label="Theme"
-                    onChange={handleThemeChange}
-                    disabled={!editing}
-                    variant={'standard'}>
-                    <MenuItem value={'theme-orange'}>Orange</MenuItem>
-                    <MenuItem value={'theme-purple'}>Purple</MenuItem>
-                    <MenuItem value={'theme-blue'}>Blue</MenuItem>
-                    <MenuItem value={'theme-green'}>Green</MenuItem>
-                    <MenuItem value={'theme-yellow'}>Yellow</MenuItem>
-                    <MenuItem value={'theme-pink'}>Pink</MenuItem>
-                </Select>
-            </FormControl>
+                    <TextField
+                        variant={'standard'}
+                        label={'Facebook'}
+                        type={'url'}
+                        autoComplete={''}
+                        value={userProfile.socialMedia.Facebook}
+                        onChange={(e) => setUserProfile({...userProfile,socialMedia:{...userProfile.socialMedia, Facebook : e.target.value}})} style={{ marginBlock: 10 }}
+                    disabled={!editing}/>
+
+                    <TextField
+                        variant={'standard'}
+                        label={'Discord'}
+                        type={'url'}
+                        autoComplete={''}
+                        value={userProfile.socialMedia.Discord}
+                        onChange={(e) => setUserProfile({...userProfile,socialMedia:{...userProfile.socialMedia, Discord : e.target.value}})} style={{ marginBlock: 10 }}
+                    disabled={!editing}/>
+                </div>
 
 
 
-            <FormTextField fieldName={'caption'} label={'Poster Caption'} type={'text'} autoCompleteHint={''} postData={postData} setPostData={setPostData} editing={editing}/>
+                <FormControl fullWidth>
+                    <InputLabel variant={'standard'}>Theme</InputLabel>
+                    <Select
+                        value={userProfile.themeDetails}
+                        label="Theme"
+                        onChange={handleThemeChange}
+                        disabled={!editing}
+                        variant={'standard'}>
+                        <MenuItem value={'theme-orange'}>Orange</MenuItem>
+                        <MenuItem value={'theme-purple'}>Purple</MenuItem>
+                        <MenuItem value={'theme-blue'}>Blue</MenuItem>
+                        <MenuItem value={'theme-green'}>Green</MenuItem>
+                        <MenuItem value={'theme-yellow'}>Yellow</MenuItem>
+                        <MenuItem value={'theme-pink'}>Pink</MenuItem>
+                    </Select>
+                </FormControl>
 
-            {editing?<Button type="submit" className={classes.buttonPrimary}>Confirm</Button>:<Button type="submit" className={classes.buttonPrimary}>Edit</Button>}
-        </form >
+
+
+                <FormTextField fieldName={'posterCaption'} label={'Poster Caption'} type={'text'} autoCompleteHint={''} userProfile={userProfile} setUserProfile={setUserProfile} editing={editing}/>
+
+                {editing?<Button type="submit" className={classes.buttonPrimary}>Confirm</Button>:<Button type="submit" className={classes.buttonPrimary}>Edit</Button>}
+            </form >
         </Paper>
     );
 }

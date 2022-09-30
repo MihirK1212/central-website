@@ -8,16 +8,18 @@ import TextField from "@material-ui/core/TextField";
 
 import "../Form/Form.css"
 
-import { updateSection } from "../../../redux/actions/contentVersions";
+import { updateSection } from "../../../redux/actions/contentVersion";
 
-export default function SectionModal({sectionID, sectionDetails, triggerElement }) {
+export default function SectionModal({currSectionId, sectionDetails, triggerElement }) {
 
     const [formSection, setFormSection] = useState(sectionDetails)
 
     const dispatch = useDispatch();
 
     const handleEdit = () => {
-        dispatch(updateSection(sectionID, formSection));
+        dispatch(updateSection({
+            sectionId : currSectionId,
+            section : {...formSection}}));
         setOpen(false);
     }
 

@@ -8,24 +8,25 @@ export type SectionChildDocument = SectionChild & Document;
 @Schema()
 export class SectionChild extends Document {
    
-    @Prop()
+    @Prop(({default : "Section Child Name"}))
     sectionChildName : string;
 
-    @Prop()
+    @Prop(({default : "Section Child Image"}))
     sectionChildImage : string;
 
-    @Prop()
+    @Prop(({default : "Section Child Short Description"}))
     sectionChildShortDesc : string;
 
-    @Prop()
+    @Prop(({default : "Section Child Dsecription"}))
     sectionChildDesc : string;
 
     @Prop({
-        type : [String]
+        type : [String],
+        default : []
     })
     sectionChildLinks : string[];
 
-    @Prop()
+    @Prop(({default : true}))
     visible : boolean;
 }
 

@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { Controller , Post , Get, Patch, Delete, Body, Param} from "@nestjs/common";
+import { Controller , Post , Get, Patch, Delete, Body, Param ,Req} from "@nestjs/common";
 import { UsersService } from "./users.service";
+import { Request } from 'express';
 
 import { AddUserDto } from "src/db/dto/add-user.dto";
 
@@ -9,16 +10,26 @@ export class UsersController {
     
     constructor(private userService : UsersService){}
 
-    @Get()
+    @Get('admin/getAll')
     async getUsers() {
         return {users : await this.userService.getUsers()}
     }
 
-    @Get(':id')
-    async getUser(
-        @Param('id') userId : string,
+    @Get('public/:id')
+    async getContentVersioPublic(
+        @Param('id') userEmailId : string,
     ) {
-        return await this.userService.getUser(userId)
+        const contentVersion = await this.userService.getContentVersion(userEmailId,"public")
+        return {contentVersion : contentVersion }
+    }
+    
+    @Get('admin')
+    async getContentVersionAdmin(
+        @Req() req: Request
+    ) {
+        const userEmailId = req.body.userEmailId
+        const contentVersion = await this.userService.getContentVersion(userEmailId , "admin")
+        return {contentVersion : contentVersion }
     }
 
     @Post()
@@ -29,15 +40,15 @@ export class UsersController {
         return {id : generatedId}
     }
 
-    @Patch(':id')
+    @Patch('admin')
     async publishVersion(
-        @Param('id') userId : string,
+        @Req() req: Request
     ) {
-        const generatedId = await this.userService.publishVersion(userId)
+        const generatedId = await this.userService.publishVersion(req.body.userEmailId)
         return {id : generatedId}
     }
 
-    @Delete(':id')
+    @Delete('admin/:id')
     async deleteUser(
         @Param('id') userId : string,
     ) {

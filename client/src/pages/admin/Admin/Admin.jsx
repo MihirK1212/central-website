@@ -8,62 +8,62 @@ import AdminProfilePage from "../AdminProfilePage/AdminProfilePage";
 import AdminHomePage from "../AdminHomePage/AdminHomePage";
 import SectionView from "../../public/SectionPage/SectionView";
 
-import { setContentVersions } from "../../../redux/actions/contentVersions";
+import { setContentVersionAdmin } from "../../../redux/actions/contentVersion";
 
 function Admin(){
 
-    const [currentSections, setCurrentSections] = useState([]);
-    const [currentUserProfile, setCurrentProfile] = useState({});
     const [loading,setLoading] = useState(true);
+    const [currentUserProfile , setCurrentUserProfile] = useState({})
+    const [currentSections , setCurrentSections] = useState([])
 
     const dispatch = useDispatch();
     useEffect(()=>{
-        dispatch(setContentVersions("","admin"))
+        dispatch(setContentVersionAdmin())
     },[dispatch])
 
-    let contentVersions = useSelector((state)=> state.contentVersions)
+    let contentVersion = useSelector((state) => state.contentVersion)
 
-    useEffect(() => {
+    const findSectionsAccToSequence = (sections,sectionSequence) => {
+        let sequence = sectionSequence.map((id) => {
+            const section = sections.find((section) => section._id == id)
+            if(!section){return;}
+            return section
+        })
+        return [...sequence]
+    }
+
+    useEffect(()=>{
         try {
+            const userProfile = {
+                ...contentVersion,
+                socialMedia : {
+                    ...contentVersion.socialMedia,
+                    LinkedIn : contentVersion.socialMedia.LinkedIn
+                }
+            }
+            setCurrentUserProfile(userProfile)
 
-            let currentVersion = contentVersions[1]
-
-            let currentName = currentVersion.userDetails.name
-            let currentLogoSrc = currentVersion.userDetails.logo
-            let currentSocialMedia = currentVersion.userDetails.socialMedia
-
-            setCurrentSections(currentVersion.Sections)
-
-            let currentEmail = currentVersion.contactDetails.email
-            let currentPhoneNumber = currentVersion.contactDetails.phoneNumber
-
-            let currentHomePagePoster = currentVersion.homePagePoster
-            let currentThemeDetails = currentVersion.themeDetails
-
-            setCurrentProfile({
-                "name": currentName, "email": currentEmail, "logo": currentLogoSrc, "socialMedia": currentSocialMedia, "phoneNumber": currentPhoneNumber,
-                "src": currentHomePagePoster.src, "caption": currentHomePagePoster.caption, "themeDetails": currentThemeDetails
-            })
+            let sectionsAccToSequence = findSectionsAccToSequence(contentVersion.sections,contentVersion.sectionSequence)
+            setCurrentSections(sectionsAccToSequence)
 
             setLoading(false)
-
         } catch (error) {
-            setCurrentSections([])
+            setLoading(true)
         }
-    }, [contentVersions])
+    },[contentVersion])
 
     return(
         <>
         {
-            !loading ?
-                <div>
+            !loading?
+                <>
                     <Routes>
-                        <Route path="/profile" element={<AdminProfilePage userProfile={currentUserProfile}/>}/>
-                        <Route path="/home" element={<AdminHomePage userProfile={currentUserProfile}/>} />
+                        <Route path="/profile" element={<AdminProfilePage/>}/>
+                        <Route path="/home" element={<AdminHomePage/>} />
                         <Route path="/preview" element={<HomePage userProfile={currentUserProfile} sections={currentSections} type="admin"/>}/>
-                        {currentSections.map(section=><Route path={"/preview/section/" + section.sectionID } element={<SectionView userProfile={currentUserProfile} sections={currentSections} id={section.sectionID} type="admin"/>} key={section.sectionID} />)}
+                        {currentSections.map(section=><Route path={"/preview/section/" + section._id } element={<SectionView userProfile={currentUserProfile} sections={currentSections} id={section._id} type="admin"/>} key={section._id} />)}
                     </Routes>
-                </div> : ""
+                </> : ""
         }
 
         </>

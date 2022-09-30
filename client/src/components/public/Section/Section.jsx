@@ -9,8 +9,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
 
 const Section = ({ section }) => {
+
     section.sectionContent = section.sectionContent.filter(sectionChild => sectionChild.visible === true)
-    console.log(section)
 
     const responsive = {
         largeDesktop: {
@@ -31,9 +31,10 @@ const Section = ({ section }) => {
             items: 1
         }
     };
+
     return (
-        <div className={`section-box theme-orange py-4 ${section.sectionID%2===0?"section-white-bg":"section-bg"}`} id={`${section.sectionName}`}>
-            {section.sectionID%2===0?"":
+        <div className={`section-box theme-orange py-4 ${"section-bg"}`} id={`${section.sectionName}`}>
+
             <ParticlesBg type="cobweb" bg={{
                 position: "absolute",
                 zIndex: 0,
@@ -45,9 +46,8 @@ const Section = ({ section }) => {
                     rps: 1,
                     g: 1
                 }}
-                color={[`${section.sectionID%2===0?"#808080":"#ffffff"}`]}
+                color={"#808080"}
             />
-            }
 
             <div className="ps-3 d-flex justify-content-evenly align-items-center section-box-child">
                 <div style={{
@@ -62,22 +62,22 @@ const Section = ({ section }) => {
                     >
                         {section.sectionContent.map(sectionChild =>
                             <SectionChildCard
-                                key={sectionChild.sectionChildID}
+                                key={sectionChild._id}
                                 sectionName={section.sectionName}
                                 sectionChild={sectionChild} />)
                         }
                     </Carousel>
                 </div>
-                <div className={`d-flex typo ${section.sectionID%2===0?"section-name":"section-white-name"}`}>
+                <div className={`d-flex typo section-name`}>
                     <div style={{
                         height: 'max-content',
                     }}>
                         {section.sectionName}
                     </div>
-                    <Link to={'/public/home/section/' + section.sectionID} style={{
+                    <Link to={'/public/home/section/' + section._id} style={{
                         zIndex: 1000
                     }}>
-                    <FontAwesomeIcon size='4px' className={`${section.sectionID%2===0?"section-icon":"section-icon-white"}`} icon={faAngleRight} />
+                    <FontAwesomeIcon size='4px' className={`section-icon`} icon={faAngleRight} />
                     </Link>
                 </div>
 

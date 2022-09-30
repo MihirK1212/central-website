@@ -10,25 +10,25 @@ export type SectionDocument = Section & Document;
 @Schema()
 export class Section extends Document {
    
-    @Prop()
+    @Prop(({required : true}))
     sectionName : string;
 
-    @Prop()
+    @Prop(({required : true}))
     sectionHeader : string;
 
-    @Prop()
+    @Prop(({default : "Section Icon"}))
     sectionIcon : string;
 
-    @Prop()
+    @Prop(({default : "Section Footer"}))
     sectionFooter : string;
 
-    @Prop()
+    @Prop(({default : "Section Description"}))
     sectionDescription : string;
 
-    @Prop()
+    @Prop(({default : "Section Theme"}))
     sectionTheme : string;
 
-    @Prop()
+    @Prop(({default : true}))
     visible : boolean;
 
     @Prop(({ type: [String] , default : []}))

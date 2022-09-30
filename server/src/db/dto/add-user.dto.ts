@@ -6,31 +6,25 @@ export class AddUserDto {
     userEmailId : string;
 
     contentVersion : {
-        
-        userEmailId : string;
+
         versionNumber : number;
 
-        userDetails : {
-            name : string,
-            logo : string,
-            socialMedia : {
-                Instagram : string,
-                LinkedIn : string,
-                Facebook : string ,
-                Discord : string,
-            }
-        };
-
-        homePagePoster : {
-            src : string,
-            caption : string
-        };
-
-        contactDetails : {
-            email : string,
-            phoneNumber : number
-        };
-
+        name : string;
+        email : string;
+        phoneNumber : number;
+        
+        logoSrc : string;
+        
+        posterSrc : string;
+        posterCaption : string;
+        
+        socialMedia : {
+            Instagram : string,
+            LinkedIn : string,
+            Facebook : string ,
+            Discord : string,
+        }
+        
         themeDetails : string;
     }
 }

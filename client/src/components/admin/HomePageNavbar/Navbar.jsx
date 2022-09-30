@@ -8,7 +8,7 @@ import Form from "react-bootstrap/Form";
 import { makeStyles } from "@material-ui/core";
 
 import Loading from "../PublishDone/Loading"
-import { publishVersion } from "../../../redux/actions/contentVersions";
+import { publishVersion } from "../../../redux/actions/contentVersion";
 
 import {styles} from "../../../variable-css"
 import { sectionsChildSchema } from "../../../schema";
@@ -16,8 +16,11 @@ import { sectionsChildSchema } from "../../../schema";
 
 const useStyles = makeStyles(styles)
 
-function AdminHomePageNavbar(props) {
+function AdminHomePageNavbar({handleSectionAdd , logoSrc}) {
+
     const classes = useStyles()
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const [show, setShow] = useState(false);
     const [done, setDone] = useState(-1);
@@ -25,35 +28,33 @@ function AdminHomePageNavbar(props) {
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    const handleAdd = () => {
+
+    const handleAddHelper = () => {
         setShow(false);
         let sectionName = document.getElementById("myForm").elements[0].value;
         let sectionHeader = document.getElementById("myForm").elements[1].value;
-        props.handlingAdd(sectionName, sectionHeader);
-    }
-    const navigate = useNavigate();
-    const redirect = () => {
-        navigate('/admin/profile')
-    }
-    const preview = () => {
-        navigate('/admin/preview')
+        handleSectionAdd(sectionName, sectionHeader);
     }
 
-    const dispatch = useDispatch()
+    const profileRedirect = () => {
+        navigate('/admin/profile')
+    }
+    const previewRedirect = () => {
+        navigate('/admin/preview')
+    }
 
     const getPublish = () => {
         dispatch(publishVersion())
         setDone(0);
         setLoading(0);
         setTimeout(() => {
-            //publish new
             setLoading(1);
             setTimeout(() => {
                 setDone(1);
             }, 1000)
         }, 1200);
-
     }
+
     return (
         <div className="navbar">
             <span id="left">
@@ -81,7 +82,7 @@ function AdminHomePageNavbar(props) {
                         <Button variant="secondary" onClick={handleClose}>
                             Close
                         </Button>
-                        <Button variant="primary" onClick={handleAdd}>
+                        <Button variant="primary" onClick={handleAddHelper}>
                             Add Section
                         </Button>
                     </Modal.Footer>
@@ -91,7 +92,7 @@ function AdminHomePageNavbar(props) {
             <span id="right">
                 <Button
                     className={classes.buttonPrimary}
-                    onClick={preview}>
+                    onClick={previewRedirect}>
                     Preview
                 </Button>
 
@@ -105,13 +106,13 @@ function AdminHomePageNavbar(props) {
                 ) : null}
                 <Button
                     className={classes.buttonOpposite}
-                    onClick={redirect}
+                    onClick={profileRedirect}
                 >
                     Profile Page
                 </Button>
                 <img
                     id="ProfilePic"
-                    src={props.profilePic}
+                    src={logoSrc}
                     alt="ProfilePic"
                     height="45px"
                     width="40px"

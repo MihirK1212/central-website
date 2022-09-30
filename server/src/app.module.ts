@@ -8,8 +8,9 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ContentModule } from './modules/content/content.module';
 import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 
-import { UserSchema } from "./db/models/users.model"
+import { UserSchema } from './db/models/users.model';
 
 import { AdminAuthMiddleware } from "src/middleware/adminauth.middleware";
 
@@ -19,7 +20,7 @@ import { AdminAuthMiddleware } from "src/middleware/adminauth.middleware";
               MongooseModule.forFeature([
                   {name : 'User' , schema : UserSchema},
               ]),
-              ContentModule , UsersModule
+              ContentModule , UsersModule , AuthModule
             ],
   controllers: [AppController],
   providers: [AppService],
@@ -28,9 +29,7 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
       consumer
         .apply(AdminAuthMiddleware)
-        .forRoutes({ path: 'api/*', method : RequestMethod.POST},
-                   { path: 'api/*', method : RequestMethod.PATCH},
-                   { path: 'api/*', method : RequestMethod.PUT},
-                   { path: 'api/*', method : RequestMethod.DELETE});
+        .forRoutes({ path: 'api/content*', method : RequestMethod.ALL},
+                   { path: 'api/users/admin*', method : RequestMethod.ALL});
     }
 }

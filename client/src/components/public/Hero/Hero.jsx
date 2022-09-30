@@ -5,12 +5,10 @@ import '../public.css'
 import { Discord, Linkedin, Instagram, Facebook} from 'react-bootstrap-icons';
 
 export default function Hero({userProfile}) {
-  console.log(userProfile)
-
-  let background = userProfile.src
+  let background = userProfile.posterSrc
 
   return (
-    // <Box className='heroBg' style={{backgroundImage: `url(${userProfile.src})`,backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundSize: 'cover'}}>
+
     <Box className='heroBg' style={{backgroundImage: `url(${background})`,backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundSize: 'cover'}}>
 
       <div className='heroText theme-orange d-flex row'>
@@ -28,7 +26,7 @@ export default function Hero({userProfile}) {
                     {userProfile.name}
                 </div>
                 <div className='heroClubDes'>
-                    {userProfile.caption}
+                    {userProfile.posterCaption}
                 </div>
             </div>
             <div className='col-1 heroContacts'>
