@@ -5,11 +5,11 @@ const sectionSchema = mongoose.Schema({
     sectionName : String,
     sectionID : Number,
     sectionHeader : String,
-    visible : Boolean,
-    sectionDescription : String,
-    sectionFooter : String,
     sectionIcon : String,
+    sectionFooter : String,
+    sectionDescription : String,
     sectionTheme : String,
+    visible : Boolean,
     sectionChildSequence : [ObjectId],
     sectionContent: [sectionChildSchema]
 })

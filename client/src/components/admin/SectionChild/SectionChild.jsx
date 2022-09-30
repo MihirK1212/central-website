@@ -10,9 +10,9 @@ import { UploadImage } from "../UploadImage/UploadImage";
 
 import { styles } from "../../../variable-css";
 
-import { deleteSectionChild } from "../../../redux/actions/contentVersions";
-import { updateSectionChild } from "../../../redux/actions/contentVersions";
-import { sectionChildSeqChange } from "../../../redux/actions/contentVersions";
+import { deleteSectionChild } from "../../../redux/actions/contentVersion";
+import { updateSectionChild } from "../../../redux/actions/contentVersion";
+import { changeSectionChildSequence } from "../../../redux/actions/contentVersion";
 
 import { uploadImageServer } from "../../../api";
 
@@ -20,30 +20,16 @@ import { sectionsChildSchema } from "../../../schema";
 import SocialModal from "../Modal/SocialModal";
 
 
-
 const useStyles = makeStyles(styles)
 
 
-function SectionChild({ userName, sectionID,  sectionName , sectionChild, sectionChildSequence ,editing}) {
+function SectionChild({ sectionId,  sectionName , sectionChild, sectionChildSequence ,editing}) {
+
     const classes = useStyles()
-
-    let sectionChildID = sectionChild.sectionChildID
-    let sectionChildIndex = sectionChildSequence.findIndex((index)=>(parseInt(index))===sectionChildID)
-
-    console.log("section child index",sectionChildIndex)
-
-    const handleChildSeqChange = (type)=>{
-        console.log("Seq change called",type)
-
-        dispatch(sectionChildSeqChange(sectionID,sectionChildID,type))
-    }
-
     const dispatch = useDispatch()
 
-    const handleDelete = () => {
-        console.log("delete section child called ",sectionID,sectionChildID)
-        dispatch(deleteSectionChild(sectionID, sectionChildID))
-    }
+    let sectionChildId = sectionChild._id
+    let sectionChildIndex = sectionChildSequence.findIndex((index)=>index===sectionChildId)
 
     const [formSectionChild, setFormSectionChild] = useState({...sectionChild})
 
@@ -52,19 +38,21 @@ function SectionChild({ userName, sectionID,  sectionName , sectionChild, sectio
       setChecked(event.target.checked);
     };
 
-
-    const handleEdit = async () => {
-        console.log("Handle edit called ")
-        console.log("Visibility status on edit submit",checked)
-        formSectionChild.visible = checked
-        console.log("Saving section child ",sectionID,sectionChildID,formSectionChild)
-        dispatch(updateSectionChild(sectionID, sectionChildID, formSectionChild))
-    };
-
     const [openModal, setOpenModal] = useState(false);
 
-    console.log("Form section child ",formSectionChild)
 
+    const handleChildSeqChange = (type)=>{
+        dispatch(changeSectionChildSequence(sectionId,sectionChildId,type))
+    }
+
+    const handleUpdateSectionChild = async () => {
+        formSectionChild.visible = checked
+        dispatch(updateSectionChild(sectionId, sectionChildId, formSectionChild))
+    }
+
+    const handleDeleteSectionChild = () => {
+        dispatch(deleteSectionChild(sectionId, sectionChildId))
+    }
 
     return (
         <div>
@@ -90,17 +78,10 @@ function SectionChild({ userName, sectionID,  sectionName , sectionChild, sectio
                                 <UploadImage aspectRatio={16 / 9} onChange={(base64EncodedImage) => {
                                         return new Promise((resolve, reject) => {
                                             uploadImageServer({
-                                                method: 'POST',
-                                                img: JSON.stringify({ data: base64EncodedImage }),
-                                                userName: userName,
-                                                dataFor: "editSectionChild",
-                                                sectionID: sectionID,
-                                                sectionChildID: sectionChildID,
-                                                headers: { 'Content-Type': 'application/json' }
+                                                img : JSON.stringify({ data: base64EncodedImage })
                                             }).then((res)=>{
-                                                console.log("image upload response",res);
                                                 setFormSectionChild({...formSectionChild,sectionChildImage:res.data.imgURL});
-                                                handleEdit()
+                                                handleUpdateSectionChild()
                                                 resolve()
                                             }).catch((err)=>{
                                                 console.log(err)
@@ -196,13 +177,13 @@ function SectionChild({ userName, sectionID,  sectionName , sectionChild, sectio
                                         <span className="material-icons" style={{cursor:"default"}} onClick={()=>{handleChildSeqChange('DOWN')}}>keyboard_arrow_down</span>:null
                                     }
 
-                                    <span className="material-icons" style={{marginLeft:50,cursor:"default"}} onClick={handleDelete}>delete</span>
+                                    <span className="material-icons" style={{marginLeft:50,cursor:"default"}} onClick={handleDeleteSectionChild}>delete</span>
                                     </>:""
                                 }
 
                             </div>
 
-                            {editing?<Button type="button" onClick={handleEdit} className={classes.buttonPrimary} style={{marginTop:15,marginLeft:200}}>Confirm</Button>:""}
+                            {editing?<Button type="button" onClick={handleUpdateSectionChild} className={classes.buttonPrimary} style={{marginTop:15,marginLeft:200}}>Confirm</Button>:""}
                         </form>
                     </div>
                 </div>

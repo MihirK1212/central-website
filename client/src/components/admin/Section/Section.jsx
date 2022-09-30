@@ -12,89 +12,81 @@ import Checkbox from "@material-ui/core/Checkbox";
 import { styles } from "../../../variable-css";
 
 import SectionChild from "../SectionChild/SectionChild";
-
 import SectionModal from "../Modal/SectionModal";
 
-import { deleteSection } from "../../../redux/actions/contentVersions";
-import { saveSection } from "../../../redux/actions/contentVersions";
-import { addSectionChild } from "../../../redux/actions/contentVersions";
+import { deleteSection } from "../../../redux/actions/contentVersion";
+import { updateSection } from "../../../redux/actions/contentVersion";
+import { addSectionChild } from "../../../redux/actions/contentVersion";
 
 const useStyles = makeStyles(styles)
 
-function Section({ userName, currSectionID }) {
+function Section({ currSectionId }) {
 
-    let sectionID = currSectionID>=0 ? currSectionID : -1 ;
-
-    // console.log("currsectionid ",currSectionID)
+    const classes = useStyles()
+    const dispatch = useDispatch()
 
     const [anchorEl, setAnchorEl] = useState(null)
     const [menuOpen, setMenuOpen] = useState(false)
-
     const [editing , setEditing] = useState(false)
 
-    const classes = useStyles()
+    let contentVersion = useSelector((state)=> state.contentVersion)
 
-    let contentVersions = useSelector((state) => state.contentVersions)
+    let sections = contentVersion.sections
+    let logoSrc = contentVersion.logoSrc
 
-    let sections = contentVersions[(contentVersions).length - 1].Sections
-    let logo = contentVersions[(contentVersions).length - 1].userDetails.logo
-
-    let section = sections.find(section => section.sectionID === currSectionID)
-
+    let section = sections.find(section => section._id === currSectionId)
     let sectionDetails = section ? {sectionName : section.sectionName, sectionHeader : section.sectionHeader} : {}
 
-    // console.log("currsection ",currSectionID,section)
 
     const [checked, setChecked] = useState(section?section.visible:false);
 
-    const find = (section)=>{
+    const createSectionChildSequence = (section)=>{
 
         if(!section){
             return []
         }
 
+        let sectionContent = section.sectionContent
         let sectionChildSequence = section.sectionChildSequence
-        let sectionChildren = section.sectionContent
 
-        let res = []
-        for(let i=0;i<sectionChildSequence.length;i++)
-        {
-            let sectionChildID = parseInt(sectionChildSequence[i])
-            let sectionChild = sectionChildren.find(sectionChild => sectionChild.sectionChildID === sectionChildID)
-            if(sectionChild){res.push(sectionChild)}
-        }
-        return res
+        let sequence = sectionChildSequence.map((id) => {
+            const sectionChild = sectionContent.find((sectionChild) => sectionChild._id == id)
+            if(!sectionChild){return;}
+            return sectionChild
+        })
+        return sequence
     }
 
-    const [sectionChildBySeq,setSectionChildBySeq] = useState([... find(section)])
-    console.log(sectionChildBySeq)
+    const [sectionChildBySeq,setSectionChildBySeq] = useState([...createSectionChildSequence(section)])
 
-    const newSectionChild = { "sectionChildName": "", "sectionChildImage": logo, "sectionChildShortDesc": "", "sectionChildDesc": "", "sectionChildLinks": [] ,"visible":true}
-
-
-    const dispatch = useDispatch()
+    const newSectionChild = { "sectionChildName": "", "sectionChildImage": logoSrc, "sectionChildShortDesc": "", "sectionChildDesc": "", "sectionChildLinks": [] ,"visible":true}
 
     useEffect(()=>{
         if(section)
         {
             setChecked(section.visible)
-            setSectionChildBySeq(find(section))
+            setSectionChildBySeq([...createSectionChildSequence(section)])
         }
 
-    },[contentVersions])
-
-    const handleDelete = () => {
-        dispatch(deleteSection(sectionID))
-    }
-
-    const handleAdd = () => {
-        dispatch(addSectionChild(sectionID, newSectionChild));
-    }
+    },[contentVersion])
 
     const handleSaveSection = () => {
         section.visible = checked
         setEditing(false)
-        dispatch(saveSection(sectionID,section))
+        let updatedSection = contentVersion.sections.find(section => section._id === currSectionId)
+        dispatch(updateSection({
+            sectionId : currSectionId,
+            section : updatedSection}))
+    }
+
+    const handleDeleteSection = () => {
+        dispatch(deleteSection({sectionId : currSectionId}))
+    }
+
+    const handleAddSectionChild = () => {
+        dispatch(addSectionChild({
+            sectionId : currSectionId,
+            sectionChild : newSectionChild}));
     }
 
     const handleChange = (event) => {
@@ -103,11 +95,14 @@ function Section({ userName, currSectionID }) {
 
     return (
 
-        sectionID>0 && section ?
+        currSectionId!=null && section ?
             <Card className={classes.section}>
                 <Box display={'flex'} justifyContent={'space-between'} marginBottom={3}>
+
                     <h3 className="header">{section.sectionHeader}</h3>
+
                     {editing && <FormControlLabel control={<Checkbox checked={checked} onChange={handleChange} />} label="Visible"/>}
+
                     {
                         editing?
                         <Button variant="contained" onClick={()=>{handleSaveSection()}}>SAVE</Button>:
@@ -115,54 +110,60 @@ function Section({ userName, currSectionID }) {
                     }
 
                     <>
-                        <IconButton onClick={(event) => {
-                            setAnchorEl(event.currentTarget)
-                            setMenuOpen(true)
-                        }}>
-                            <MoreVert fontSize="small" />
-                        </IconButton>
-                        <Menu open={menuOpen} onClose={() => { setMenuOpen(false) }} anchorEl={anchorEl}>
-                            <MenuList>
-                                {
-                                    editing?<MenuItem  onClick={handleAdd}>
-                                    <ListItemIcon>
-                                        <Add fontSize="small" />
-                                    </ListItemIcon>
-                                    <ListItemText>{`Add ${section.sectionName}`}</ListItemText>
-                                </MenuItem> : ""
-                                }
-
-
-                                <MenuItem onClick={handleDelete}>
-                                    <ListItemIcon >
-                                        <Delete fontSize="small" />
-                                    </ListItemIcon>
-                                    <ListItemText>Delete</ListItemText>
-                                </MenuItem>
-                                <SectionModal userName={userName}
-                                    sectionID={sectionID}
-                                    sectionDetails={sectionDetails} triggerElement={
-                                        <MenuItem>
+                        {
+                            editing &&
+                                <>
+                                    <IconButton onClick={(event) => {
+                                        setAnchorEl(event.currentTarget)
+                                        setMenuOpen(true)
+                                    }}>
+                                        <MoreVert fontSize="small" />
+                                    </IconButton>
+                                    <Menu open={menuOpen} onClose={() => { setMenuOpen(false) }} anchorEl={anchorEl}>
+                                    <MenuList>
+                                        {
+                                            editing?<MenuItem  onClick={handleAddSectionChild}>
                                             <ListItemIcon>
-                                                <Edit fontSize="small" />
+                                                <Add fontSize="small" />
                                             </ListItemIcon>
-                                            <ListItemText>Update</ListItemText>
+                                            <ListItemText>{`Add ${section.sectionName}`}</ListItemText>
+                                        </MenuItem> : ""
+                                        }
+
+                                        <MenuItem onClick={handleDeleteSection}>
+                                            <ListItemIcon >
+                                                <Delete fontSize="small" />
+                                            </ListItemIcon>
+                                            <ListItemText>Delete</ListItemText>
                                         </MenuItem>
-                                    } />
-                            </MenuList>
-                        </Menu>
+
+                                        <SectionModal
+                                            currSectionId={currSectionId}
+                                            sectionDetails={sectionDetails} triggerElement={
+                                                <MenuItem>
+                                                    <ListItemIcon>
+                                                        <Edit fontSize="small" />
+                                                    </ListItemIcon>
+                                                    <ListItemText>Update</ListItemText>
+                                                </MenuItem>
+                                            } />
+                                    </MenuList>
+                                </Menu>
+                            </>
+                        }
+
                     </>
                 </Box>
                 <Grid container spacing={3} justifyContent="center">
-                    {find(section).map(sectionChild =>
-                        <Grid item key={sectionChild.sectionChildID}>
-                            <SectionChild userName={userName}
-                                sectionID={sectionID}
+                    {sectionChildBySeq.map((sectionChild) =>
+                        <Grid item key={sectionChild._id}>
+                            <SectionChild
+                                sectionId={currSectionId}
                                 sectionName={section.sectionName}
                                 sectionChild={{...sectionChild}}
                                 sectionChildSequence={section.sectionChildSequence}
                                 editing={editing}
-                                key={sectionChild.sectionChildID}
+                                key={sectionChild._id}
                                 />
                         </Grid>)}
                 </Grid>

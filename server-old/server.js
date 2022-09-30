@@ -40,13 +40,13 @@ app.get('/', (req, res) => {
 })
 
 
-import usersRoute from './routes/users.js';
+import usersRoute from './routes/users.js.js';
 app.use('/users', jwtAuth,usersRoute)
 
-import contentRoute from './routes/content.js';
+import contentRoute from './routes/content.js.js';
 app.use('/content', jwtAuth,contentRoute)
 
-import authRoute from './routes/auth.js';
+import authRoute from './routes/auth.js.js';
 app.use('/auth',authRoute)
 
 app.use('/uploadImage',jwtAuth)

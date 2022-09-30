@@ -1,8 +1,8 @@
 import { combineReducers } from "redux";
 
-import contentVersions from './contentVersions'
+import contentVersion from './contentVersion'
 import adminAuth from "./adminAuth"
 
 export default combineReducers({
-    contentVersions , adminAuth
+    contentVersion , adminAuth
 })

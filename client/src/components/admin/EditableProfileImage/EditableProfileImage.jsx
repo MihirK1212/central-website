@@ -10,7 +10,7 @@ import { uploadImageServer } from "../../../api"
 
 const useStyles = makeStyles(styles)
 
-export const EditableProfileImage = ({ postData , setPostData , handleSubmit, imageAlt, type, imageSrc, userProfile }) => {
+export const EditableProfileImage = ({ userProfile , setUserProfile , handleSubmit, imageAlt, type, imageSrc }) => {
     const classes = useStyles()
 
     return (
@@ -25,19 +25,14 @@ export const EditableProfileImage = ({ postData , setPostData , handleSubmit, im
                 return new Promise((resolve, reject) => {
                     try {
                         uploadImageServer({
-                            method: 'POST',
-                            img: JSON.stringify({ data: base64EncodedImage }),
-                            userName: userProfile.userName,
-                            dataFor: type,
-                            headers: { 'Content-Type': 'application/json' }
+                            img : JSON.stringify({ data: base64EncodedImage })
                         }).then((res)=>{
-                            console.log("image upload response",res);
 
-                            if(type=="poste"){
-                                setPostData({...postData,src:res.data.imgURL});
+                            if(type=="poster"){
+                                setUserProfile({...userProfile,posterSrc:res.data.imgURL});
                             }
                             else{
-                                setPostData({...postData,logo:res.data.imgURL});
+                                setUserProfile({...userProfile,logoSrc:res.data.imgURL});
                             }
                             handleSubmit()
                             resolve()

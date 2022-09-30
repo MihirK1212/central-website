@@ -3,98 +3,81 @@ import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
-import { setContentVersions } from "../../../redux/actions/contentVersions";
-
 import HomePage from "../HomePage/HomePage";
 import SectionView from "../SectionPage/SectionView";
 import Loader from "../../../components/Loader/Loader";
+
+import { setContentVersionPublic } from "../../../redux/actions/contentVersion";
+
 
 import urlMap from "./urlMap"
 
 function Public() {
 
-    const currentUser = urlMap[window.location.href]
+    const currentUserEmailId = urlMap[window.location.origin]
 
-
-    const [publishedSections, setPublishedSections] = useState([]);
-    const [publishedUserProfile, setPublishedProfile] = useState({});
     const [loading,setLoading] = useState(true);
-
-    const findSectionsAccToSequence = (sections,sequence) => {
-        console.log("In public ")
-        console.log("Orig Sections",sections)
-        console.log("Sequence",sequence)
-        let sectionsAccToSequence = []
-        for(let i=0;i<sequence.length;i++)
-        {
-            let sectionID = parseInt(sequence[i])
-            let section = sections.find(section => section.sectionID === sectionID)
-            if(section){sectionsAccToSequence.push(section)}
-        }
-        console.log("Sequence Sections public",sectionsAccToSequence)
-
-        return sectionsAccToSequence
-    }
+    const [publishedUserProfile , setPublishedUserProfile] = useState({})
+    const [publishedSections , setPublishedSections] = useState([])
 
     const dispatch = useDispatch();
-
     useEffect(() => {
-        dispatch(setContentVersions(currentUser, "public"))
+        dispatch(setContentVersionPublic(currentUserEmailId))
     }, [dispatch])
 
-    let contentVersions = useSelector((state) => state.contentVersions)
 
-    useEffect(() => {
+    let contentVersion = useSelector((state) => state.contentVersion)
+
+    const findSectionsAccToSequence = (sections,sectionSequence) => {
+        try{
+            let sequence = sectionSequence.map((id) => {
+                const section = sections.find((section) => section._id == id)
+                if(!section){return;}
+                return section
+            })
+            return [...sequence]
+        }
+        catch{
+            return []
+        }
+    }
+
+
+
+    useEffect(()=>{
         try {
-            let userName = currentUser
+            const userProfile = {
+                ...contentVersion,
+                socialMedia : {
+                    ...contentVersion.socialMedia,
+                    LinkedIn : contentVersion.socialMedia.LinkedIn
+                }
+            }
+            setPublishedUserProfile(userProfile)
 
-            let publishedVersion = contentVersions[0]
-
-            let publishedName = publishedVersion.userDetails.name
-            let publishedLogoSrc = publishedVersion.userDetails.logo
-            let publishedSocialMedia = publishedVersion.userDetails.socialMedia
-            let sectionSequence = publishedVersion.sectionSequence
-
-            let sectionsAccToSequence = findSectionsAccToSequence(publishedVersion.Sections,sectionSequence)
-            console.log("After returning",sectionsAccToSequence)
+            let sectionsAccToSequence = findSectionsAccToSequence(contentVersion.sections,contentVersion.sectionSequence)
             setPublishedSections(sectionsAccToSequence)
 
-            console.log("Published sections",publishedSections)
-
-
-            let publishedEmail = publishedVersion.contactDetails.email
-            let publishedPhoneNumber = publishedVersion.contactDetails.phoneNumber
-
-            let publishedHomePagePoster = publishedVersion.homePagePoster
-            let publishedThemeDetails = publishedVersion.themeDetails
-
-            setPublishedProfile({
-                "userName": userName, "name": publishedName, "email": publishedEmail, "logo": publishedLogoSrc, "socialMedia": publishedSocialMedia, "phoneNumber": publishedPhoneNumber,
-                "src": publishedHomePagePoster.src, "caption": publishedHomePagePoster.caption, "theme": publishedThemeDetails
-            })
-
-
             setLoading(false)
-
-
         } catch (error) {
             setPublishedSections([])
+            setLoading(true)
         }
 
-    }, [contentVersions])
+    },[contentVersion])
 
-    console.log("Published sections",publishedSections)
+    console.log(publishedSections,publishedUserProfile)
 
     return (
         <>
             {
-                !loading ?
-                    <div>
+                !loading?
+                    <>
                         <Routes>
-                            <Route path="/home" element={<HomePage userProfile={publishedUserProfile} sections={publishedSections} type="public" />} />
-                            {publishedSections.map(section => <Route path={"/home/section/" + section.sectionID} element={<SectionView userProfile={publishedUserProfile} sections={publishedSections} id={section.sectionID} type="public" />} key={section.sectionID} />)}
+                            <Route path="/home" element={<HomePage userProfile={publishedUserProfile} sections={publishedSections} type="public"/>} />
+                            {publishedSections.map(section => <Route path={"/home/section/" + section._id} element={<SectionView userProfile={publishedUserProfile} sections={publishedSections} id={section._id} type="public" />} key={section._id} />)}
                         </Routes>
-                    </div> : <Loader/>
+                    </> : <Loader/>
             }
 
         </>
