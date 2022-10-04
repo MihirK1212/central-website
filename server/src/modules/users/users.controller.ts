@@ -32,7 +32,7 @@ export class UsersController {
         return {contentVersion : contentVersion }
     }
 
-    @Post()
+    @Post('adduser')
     async addUser(
         @Body() newUserDetails : AddUserDto
     ) { 
