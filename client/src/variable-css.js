@@ -1,8 +1,8 @@
 const colors = {
     primary: '#ffefc7',
     primaryShade: '#3c2117',
-    accent: '#3c2117',
-    accentShade: 'white'
+    accent: '#a65b3f',
+    accentShade: '#1a0e0a'
 }
 
 export const styles = {

@@ -1,4 +1,4 @@
-import {React} from 'react'
+import { React } from 'react'
 import SectionChildCard from '../SectionChild/SectionChildCard';
 import ParticlesBg from 'particles-bg'
 import Carousel from "react-multi-carousel";
@@ -10,7 +10,10 @@ import { Link } from 'react-router-dom'
 
 const Section = ({ section }) => {
 
-    section.sectionContent = section.sectionContent.filter(sectionChild => sectionChild.visible === true)
+    section.sectionContent = section.sectionContent.filter(sectionChild => sectionChild.visible === true);
+
+    // to alternate the colors of the section-children.
+    let counter = 0;
 
     const responsive = {
         largeDesktop: {
@@ -58,13 +61,13 @@ const Section = ({ section }) => {
                         autoPlaySpeed={3000}
                         autoPlay={true}
                         infinite={true}
-
                     >
                         {section.sectionContent.map(sectionChild =>
                             <SectionChildCard
                                 key={sectionChild._id}
                                 sectionName={section.sectionName}
-                                sectionChild={sectionChild} />)
+                                sectionChild={sectionChild}
+                                index={counter++}/>)
                         }
                     </Carousel>
                 </div>
@@ -77,7 +80,7 @@ const Section = ({ section }) => {
                     <Link to={'/public/home/section/' + section._id} style={{
                         zIndex: 1000
                     }}>
-                    <FontAwesomeIcon size='4px' className={`section-icon`} icon={faAngleRight} />
+                        <FontAwesomeIcon size='4px' className={`section-icon`} icon={faAngleRight} />
                     </Link>
                 </div>
 

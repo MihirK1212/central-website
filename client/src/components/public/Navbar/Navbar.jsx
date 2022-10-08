@@ -5,7 +5,6 @@ import '../public.css'
 
 export default function Navbar({ userProfile, sections, type }) {
 
-
     sections = sections.filter(section => section.visible === true)
 
     const [state, setState] = React.useState({
@@ -71,7 +70,7 @@ export default function Navbar({ userProfile, sections, type }) {
                         </a>
                         <div className="container col-11 align-items-right container-fluid links-wrapper" >
                             <div className="col d-flex" style={{ flexDirection: "row-reverse" }}>
-                                <a href="#contactus" className='contactUs col-2 py-2 text-center'>Contact Us</a>
+                                <a href="#contactus" className='contactUs'>Contact Us</a>
                                 <List>
                                     <a className='quick-links' href={homeLink}>
                                                 <ListItem className='quick-links' button>
@@ -105,6 +104,7 @@ export default function Navbar({ userProfile, sections, type }) {
 
                                     {sectionLinksList('right')}
 
+                                    
                                     <a href="#contactus" className='contact'>Contact Us</a>
 
                                 </Drawer>

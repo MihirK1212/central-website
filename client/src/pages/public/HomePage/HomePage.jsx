@@ -9,7 +9,7 @@ import SectionLoading from '../../../components/public/Section/SectionLoading';
 
 export default function HomePage({userProfile , sections ,  type}) {
 
-    sections = sections.filter(section => section.visible === true)
+  sections = sections.filter(section => section.visible === true);
 
     return (
      <div>
@@ -17,8 +17,13 @@ export default function HomePage({userProfile , sections ,  type}) {
         <Hero userProfile={userProfile}/>
 
 
-        {
-            sections.length > 0 ? sections.map(section => section.sectionContent.length>0? <Section key={section._id} section={section} />:"") :
+        {sections.length > 0 ?
+          sections.map(section =>
+            section.sectionContent.length > 0 ?
+              <Section key={section._id} section={section}  />
+              :
+              <></>
+          ) :
             <SectionsLoading />
         }
 
