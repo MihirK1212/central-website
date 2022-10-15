@@ -3,10 +3,11 @@ import { Box, Typography, Paper } from "@mui/material";
 import '../public.css'
 import { sectionsChildSchema } from '../../../schema';
 
-const SectionChildCard = ({ sectionChild, sectionName }) => {
+const SectionChildCard = ({ sectionChild, sectionName, index }) => {
     return (
-        <Paper sx={{ maxWidth: '320px', zIndex: 10, borderRadius: '25px', margin: '0, 20px' }} elevation={3}>
-            <Box gap={5} padding={3}  >
+        // hardcode the height and width of the section-child, to maintain consistency of UI.
+        <Paper sx={{ width: '280px', height:'400px', zIndex: 10, borderRadius: '25px', backgroundColor: (index ? 'gray' : 'white'), }} elevation={3}>
+            <Box gap={5} padding={3} >
                 <img src={sectionChild.sectionChildImage} style={{ borderRadius: '25px', objectFit: 'cover' }} alt={sectionChild.sectionChildName} height={180}
                     width={'100%'} />
                 <Box>

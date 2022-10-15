@@ -56,7 +56,6 @@
   .contactUs {
       background-color: var(--themeColor);
       border-radius: 100px;
-      font-style: normal;
       text-align: center;
       font-size: 18px;
       font-weight: 430;
@@ -64,6 +63,12 @@
       text-decoration: none;
       box-shadow: 10px 10px 10px 10px var(--themeColor);
       box-shadow: var(--themeColor) 0px 1px 10px 0px;
+
+      width: 160px;
+      height: 60px;
+      line-height: 60px;
+      text-align: center;
+      margin-block: auto;
   }
   body {
     overflow-x: hidden;
@@ -273,7 +278,7 @@
     font-size: 50px;
     font-weight: bold;
     text-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-    color: var(--themeColor);
+    color: var(--themeVLight);
     font-family: 'Montserrat';
     padding-bottom: 5px
 }
