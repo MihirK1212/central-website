@@ -18,6 +18,7 @@ export class AdminAuthMiddleware implements NestMiddleware {
     async use(req: Request, res: Response, next: NextFunction) {
       
       try{
+          // next(); return; //this disables auth
           console.log("Middleware called")
           const decoded = jwt.verify(req.headers.authorization, process.env.JWT_KEY) as jwt.JwtPayload
       
