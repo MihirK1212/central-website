@@ -29,6 +29,8 @@ function App() {
         return Promise.reject(error);
     });
 
+    console.log('adminAuth', adminAuth)
+
     return (
         <>
             {

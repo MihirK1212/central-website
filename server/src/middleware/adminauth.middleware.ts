@@ -18,9 +18,7 @@ export class AdminAuthMiddleware implements NestMiddleware {
     async use(req: Request, res: Response, next: NextFunction) {
       
       try{
-          // next();
           console.log("Middleware called")
-          // console.log("In jwt middleware ",req.headers)
           const decoded = jwt.verify(req.headers.authorization, process.env.JWT_KEY) as jwt.JwtPayload
       
           const userId = decoded.userId

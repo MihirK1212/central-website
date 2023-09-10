@@ -14,6 +14,7 @@ export class AuthController {
     async googleLogin(
         @Body() googleLoginData : {emailId : string}
     ) {
+        console.log('googlelogin called')
         const authData  = await this.authService.googleLogin(googleLoginData)
         return {authData : authData}
     }

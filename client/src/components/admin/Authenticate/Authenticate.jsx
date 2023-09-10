@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import { googlelogin } from '../../../api';
 import { loginAdmin } from '../../../redux/actions/adminAuth';
 
+
 export default function Authenticate() {
 
     const dispatch = useDispatch()
@@ -20,7 +21,7 @@ export default function Authenticate() {
         googlelogin({
             emailId : userObject.email
         }).then(response => {
-            console.log(response)
+            console.log('google login response', response)
             if (response.status === 201) {
                 localStorage.setItem('token', response.data.authData.token)
                 dispatch(loginAdmin())
@@ -31,7 +32,8 @@ export default function Authenticate() {
     useEffect(()=>{
         /* global google */
         google.accounts.id.initialize({
-            client_id:"687468938838-qv69j02oai1engmjkd6el428ui4uquom.apps.googleusercontent.com",
+            //google client id
+            client_id:"630790416751-runp94j178kl5h6t7lhunn3jpilr2f4a.apps.googleusercontent.com",
             callback : handleCallbackResponse
         })
         google.accounts.id.renderButton(
