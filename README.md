@@ -26,6 +26,6 @@ display wide information in interactive way.
 ### Tech Stacks
 
 - Frontend : React , Material UIB
-- Backend : Node JS , Express JS
+- Backend : Nest TS 
 - Database: MongoDB
 
